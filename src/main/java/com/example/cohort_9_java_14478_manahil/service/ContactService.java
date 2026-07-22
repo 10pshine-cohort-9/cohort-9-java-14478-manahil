@@ -19,10 +19,23 @@ public class ContactService {
 
 
     // Create contact
-    public Contact createContact(Contact contact) {
-        return contactRepository.save(contact);
-    }
 
+    // Create contact
+    public ContactDTO createContact(ContactDTO contactDTO) {
+
+        Contact contact = new Contact();
+
+        contact.setFirstName(contactDTO.getFirstName());
+        contact.setLastName(contactDTO.getLastName());
+        contact.setEmail(contactDTO.getEmail());
+        contact.setPhoneNumber(contactDTO.getPhoneNumber());
+        contact.setCompany(contactDTO.getCompany());
+        contact.setJobTitle(contactDTO.getJobTitle());
+
+        Contact savedContact = contactRepository.save(contact);
+
+        return convertToDTO(savedContact);
+    }
 
     // Get all contacts (DTO)
     public List<ContactDTO> getAllContacts() {
@@ -47,21 +60,24 @@ public class ContactService {
 
 
     // Update contact
-    public Contact updateContact(Long id, Contact contactDetails) {
+    // Update contact
+    public ContactDTO updateContact(Long id, ContactDTO contactDTO) {
 
         Contact existingContact = contactRepository.findById(id)
                 .orElseThrow(() ->
                         new ContactNotFoundException("Contact not found with id: " + id)
                 );
 
-        existingContact.setFirstName(contactDetails.getFirstName());
-        existingContact.setLastName(contactDetails.getLastName());
-        existingContact.setEmail(contactDetails.getEmail());
-        existingContact.setPhoneNumber(contactDetails.getPhoneNumber());
-        existingContact.setCompany(contactDetails.getCompany());
-        existingContact.setJobTitle(contactDetails.getJobTitle());
+        existingContact.setFirstName(contactDTO.getFirstName());
+        existingContact.setLastName(contactDTO.getLastName());
+        existingContact.setEmail(contactDTO.getEmail());
+        existingContact.setPhoneNumber(contactDTO.getPhoneNumber());
+        existingContact.setCompany(contactDTO.getCompany());
+        existingContact.setJobTitle(contactDTO.getJobTitle());
 
-        return contactRepository.save(existingContact);
+        Contact updatedContact = contactRepository.save(existingContact);
+
+        return convertToDTO(updatedContact);
     }
 
 
