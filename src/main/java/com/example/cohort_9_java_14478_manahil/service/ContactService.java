@@ -109,6 +109,14 @@ public class ContactService {
     public List<Contact> searchByJobTitle(String jobTitle) {
         return contactRepository.findByJobTitleContainingIgnoreCase(jobTitle);
     }
+
+    public List<Contact> filterByCompany(String company) {
+        return contactRepository.findByCompany(company);
+    }
+
+    public List<Contact> filterByJobTitle(String jobTitle) {
+        return contactRepository.findByJobTitle(jobTitle);
+    }
     // Entity to DTO conversion
     private ContactDTO convertToDTO(Contact contact) {
 

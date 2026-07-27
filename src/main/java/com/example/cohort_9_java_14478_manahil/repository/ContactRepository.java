@@ -15,4 +15,7 @@ public interface ContactRepository extends JpaRepository<Contact, Long> {
     List<Contact> findByCompanyContainingIgnoreCase(String company);
 
     List<Contact> findByJobTitleContainingIgnoreCase(String jobTitle);
+    List<Contact> findByCompany(String company);
+
+    List<Contact> findByJobTitle(String jobTitle);
 }
