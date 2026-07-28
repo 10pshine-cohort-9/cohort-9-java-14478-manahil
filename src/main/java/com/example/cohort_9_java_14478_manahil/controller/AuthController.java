@@ -2,8 +2,9 @@ package com.example.cohort_9_java_14478_manahil.controller;
 
 import com.example.cohort_9_java_14478_manahil.dto.AuthResponse;
 import com.example.cohort_9_java_14478_manahil.dto.LoginRequest;
-import com.example.cohort_9_java_14478_manahil.entity.User;
+import com.example.cohort_9_java_14478_manahil.dto.RegisterRequest;
 import com.example.cohort_9_java_14478_manahil.service.AuthService;
+import jakarta.validation.Valid;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -17,12 +18,12 @@ public class AuthController {
     }
 
     @PostMapping("/register")
-    public AuthResponse register(@RequestBody User user) {
-        return authService.register(user);
+    public AuthResponse register(@Valid @RequestBody RegisterRequest request) {
+        return authService.register(request);
     }
 
     @PostMapping("/login")
-    public AuthResponse login(@RequestBody LoginRequest request) {
+    public AuthResponse login(@Valid @RequestBody LoginRequest request) {
         return authService.login(request);
     }
 }

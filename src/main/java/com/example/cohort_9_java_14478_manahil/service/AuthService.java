@@ -1,5 +1,5 @@
 package com.example.cohort_9_java_14478_manahil.service;
-
+import com.example.cohort_9_java_14478_manahil.dto.RegisterRequest;
 import com.example.cohort_9_java_14478_manahil.dto.AuthResponse;
 import com.example.cohort_9_java_14478_manahil.dto.LoginRequest;
 import com.example.cohort_9_java_14478_manahil.entity.User;
@@ -31,9 +31,19 @@ public class AuthService {
     }
 
     // Register
-    public AuthResponse register(User user) {
+    // Register
+    public AuthResponse register(RegisterRequest request) {
 
-        user.setPassword(passwordEncoder.encode(user.getPassword()));
+        User user = new User();
+
+        user.setFirstName(request.getFirstName());
+        user.setLastName(request.getLastName());
+        user.setEmail(request.getEmail());
+        user.setPhoneNumber(request.getPhoneNumber());
+        user.setPassword(passwordEncoder.encode(request.getPassword()));
+
+        // Always assign USER role
+        user.setRole("USER");
 
         User savedUser = userRepository.save(user);
 
@@ -41,7 +51,7 @@ public class AuthService {
                 org.springframework.security.core.userdetails.User
                         .withUsername(savedUser.getEmail())
                         .password(savedUser.getPassword())
-                        .roles(savedUser.getRole() == null ? "USER" : savedUser.getRole())
+                        .roles(savedUser.getRole())
                         .build();
 
         String token = jwtService.generateToken(userDetails);
