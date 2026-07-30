@@ -67,7 +67,7 @@ class ContactControllerTest {
         dto.setFirstName("Manahil");
         dto.setLastName("Waheed");
 
-        when(contactService.getAllContacts()).thenReturn(List.of(dto));
+
 
         mockMvc.perform(get("/api/contacts"))
                 .andExpect(status().isOk())
