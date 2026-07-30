@@ -9,7 +9,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-
+import com.example.cohort_9_java_14478_manahil.dto.ChangePasswordRequest;
+import org.springframework.security.core.Authentication;
 @RestController
 @RequestMapping("/api/users")
 public class UserController {
@@ -65,5 +66,14 @@ public class UserController {
         userService.deleteUser(id);
 
         return ResponseEntity.ok("User deleted successfully");
+    }
+    @PutMapping("/change-password")
+    public ResponseEntity<String> changePassword(
+            Authentication authentication,
+            @Valid @RequestBody ChangePasswordRequest request) {
+
+        userService.changePassword(authentication.getName(), request);
+
+        return ResponseEntity.ok("Password changed successfully.");
     }
 }
