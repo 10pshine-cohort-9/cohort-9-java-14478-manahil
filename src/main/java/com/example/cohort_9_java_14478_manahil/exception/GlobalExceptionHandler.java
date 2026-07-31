@@ -33,7 +33,23 @@ public class GlobalExceptionHandler {
 
         return new ResponseEntity<>(ex.getMessage(), HttpStatus.NOT_FOUND);
     }
+    // Handle User Not Found
+    @ExceptionHandler(UserNotFoundException.class)
+    public ResponseEntity<String> handleUserNotFound(
+            UserNotFoundException ex) {
 
+        return new ResponseEntity<>(ex.getMessage(), HttpStatus.NOT_FOUND);
+    }
+    // Handle invalid requests (e.g., incorrect current password)
+    @ExceptionHandler(IllegalArgumentException.class)
+    public ResponseEntity<String> handleIllegalArgument(
+            IllegalArgumentException ex) {
+
+        return new ResponseEntity<>(
+                ex.getMessage(),
+                HttpStatus.BAD_REQUEST
+        );
+    }
     // Handle any unexpected errors
     @ExceptionHandler(Exception.class)
     public ResponseEntity<String> handleGeneralException(Exception ex) {
