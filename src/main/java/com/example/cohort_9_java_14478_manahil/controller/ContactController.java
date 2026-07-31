@@ -96,6 +96,18 @@ public class ContactController {
 
         return ResponseEntity.ok(contactService.searchByJobTitle(jobTitle));
     }
+    @GetMapping("/filter/company")
+    public ResponseEntity<List<Contact>> filterByCompany(
+            @RequestParam String company) {
+
+        return ResponseEntity.ok(contactService.filterByCompany(company));
+    }
+    @GetMapping("/filter/jobtitle")
+    public ResponseEntity<List<Contact>> filterByJobTitle(
+            @RequestParam String jobTitle) {
+
+        return ResponseEntity.ok(contactService.filterByJobTitle(jobTitle));
+    }
 
 
 }
