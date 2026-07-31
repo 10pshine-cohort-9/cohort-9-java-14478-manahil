@@ -73,7 +73,7 @@ public class ContactService {
         return convertToDTO(contact);
     }
 
-    // Update Contact
+    // Update contact
     public ContactDTO updateContact(Long id, ContactDTO contactDTO) {
 
         logger.info("Updating contact with ID: {}", id);
@@ -117,6 +117,7 @@ public class ContactService {
 
         logger.info("Contact deleted successfully.");
     }
+
 
     // Search Contacts
     public List<ContactDTO> searchByFirstName(String firstName) {
@@ -183,8 +184,9 @@ public class ContactService {
                 .toList();
     }
 
-    // Entity to DTO Conversion
-    private ContactDTO convertToDTO(Contact contact) {
+
+    // Entity to DTO conversion
+private ContactDTO convertToDTO(Contact contact) {
 
         ContactDTO dto = new ContactDTO();
 
