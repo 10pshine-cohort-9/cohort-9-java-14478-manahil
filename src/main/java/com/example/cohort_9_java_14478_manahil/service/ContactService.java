@@ -58,8 +58,6 @@ public class ContactService {
         return convertToDTO(contact);
     }
 
-
-    // Update contact
     // Update contact
     public ContactDTO updateContact(Long id, ContactDTO contactDTO) {
 
@@ -92,7 +90,25 @@ public class ContactService {
         contactRepository.delete(existingContact);
     }
 
+    public List<Contact> searchByFirstName(String firstName) {
+        return contactRepository.findByFirstNameContainingIgnoreCase(firstName);
+    }
 
+    public List<Contact> searchByLastName(String lastName) {
+        return contactRepository.findByLastNameContainingIgnoreCase(lastName);
+    }
+
+    public List<Contact> searchByEmail(String email) {
+        return contactRepository.findByEmailContainingIgnoreCase(email);
+    }
+
+    public List<Contact> searchByCompany(String company) {
+        return contactRepository.findByCompanyContainingIgnoreCase(company);
+    }
+
+    public List<Contact> searchByJobTitle(String jobTitle) {
+        return contactRepository.findByJobTitleContainingIgnoreCase(jobTitle);
+    }
     // Entity to DTO conversion
     private ContactDTO convertToDTO(Contact contact) {
 
