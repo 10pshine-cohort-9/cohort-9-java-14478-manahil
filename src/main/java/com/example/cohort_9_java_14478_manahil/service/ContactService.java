@@ -73,7 +73,7 @@ public class ContactService {
         return convertToDTO(contact);
     }
 
-    // Update contact
+    // Update Contact
     public ContactDTO updateContact(Long id, ContactDTO contactDTO) {
 
         logger.info("Updating contact with ID: {}", id);
@@ -118,9 +118,10 @@ public class ContactService {
         logger.info("Contact deleted successfully.");
     }
 
-
     // Search Contacts
+
     public List<ContactDTO> searchByFirstName(String firstName) {
+
         logger.info("Searching contacts by first name: {}", firstName);
 
         return contactRepository.findByFirstNameContainingIgnoreCase(firstName)
@@ -130,6 +131,7 @@ public class ContactService {
     }
 
     public List<ContactDTO> searchByLastName(String lastName) {
+
         logger.info("Searching contacts by last name: {}", lastName);
 
         return contactRepository.findByLastNameContainingIgnoreCase(lastName)
@@ -139,6 +141,7 @@ public class ContactService {
     }
 
     public List<ContactDTO> searchByEmail(String email) {
+
         logger.info("Searching contacts by email: {}", email);
 
         return contactRepository.findByEmailContainingIgnoreCase(email)
@@ -148,6 +151,7 @@ public class ContactService {
     }
 
     public List<ContactDTO> searchByCompany(String company) {
+
         logger.info("Searching contacts by company: {}", company);
 
         return contactRepository.findByCompanyContainingIgnoreCase(company)
@@ -157,6 +161,7 @@ public class ContactService {
     }
 
     public List<ContactDTO> searchByJobTitle(String jobTitle) {
+
         logger.info("Searching contacts by job title: {}", jobTitle);
 
         return contactRepository.findByJobTitleContainingIgnoreCase(jobTitle)
@@ -168,6 +173,7 @@ public class ContactService {
     // Filter Contacts
 
     public List<ContactDTO> filterByCompany(String company) {
+
         logger.info("Filtering contacts by company: {}", company);
 
         return contactRepository.findByCompany(company)
@@ -175,7 +181,9 @@ public class ContactService {
                 .map(this::convertToDTO)
                 .toList();
     }
+
     public List<ContactDTO> filterByJobTitle(String jobTitle) {
+
         logger.info("Filtering contacts by job title: {}", jobTitle);
 
         return contactRepository.findByJobTitleContainingIgnoreCase(jobTitle)
@@ -184,9 +192,8 @@ public class ContactService {
                 .toList();
     }
 
-
-    // Entity to DTO conversion
-private ContactDTO convertToDTO(Contact contact) {
+    // Entity to DTO Conversion
+    private ContactDTO convertToDTO(Contact contact) {
 
         ContactDTO dto = new ContactDTO();
 
