@@ -1,37 +1,112 @@
 import { useEffect, useState } from "react";
 import API from "../api/axiosConfig";
+import ContactTable from "../components/ContactTable";
+import ContactFormModal from "../components/ContactFormModal";
+import SearchBar from "../components/SearchBar";
+import Filter from "../components/Filter";
+import DeleteModal from "../components/DeleteModal";
+import PaginationControls from "../components/PaginationControls";
+import * as bootstrap from "bootstrap";
 
 function Contacts() {
-
   const [contacts, setContacts] = useState([]);
-const [newContact, setNewContact] = useState({
-  firstName: "",
-  lastName: "",
-  email: "",
-  phoneNumber: "",
-  company: "",
-  jobTitle: ""
+
+  const [newContact, setNewContact] = useState({
+    firstName: "",
+    lastName: "",
+    email: "",
+    phoneNumber: "",
+    company: "",
+    jobTitle: "",
+  });
+  const [selectedContact, setSelectedContact] = useState(null);
+
+const [loading, setLoading] = useState(false);
+
+const [alert, setAlert] = useState({
+  show: false,
+  message: "",
+  type: "success",
 });
- const [page, setPage] = useState(0);
-const [totalPages, setTotalPages] = useState(0);
-  const fetchContacts = () => {
-  API.get(`/contacts?page=${page}&size=5`)
-    .then((response) => {
-      setContacts(response.data.content);
-      setTotalPages(response.data.totalPages);
-    })
-    .catch((error) => {
-      console.log(error);
-    });
-};
-useEffect(() => {
-  fetchContacts();
-}, [page]);
-const addContact = async () => {
+
+const [searchType, setSearchType] = useState("firstname");
+const [searchText, setSearchText] = useState("");
+
+const [companyFilter, setCompanyFilter] = useState("");
+const [jobFilter, setJobFilter] = useState("");
+
+const [isEditing, setIsEditing] = useState(false);
+const [selectedContactId, setSelectedContactId] = useState(null);
+
+  const [page, setPage] = useState(0);
+  const [totalPages, setTotalPages] = useState(0);
+
+const fetchContacts = async () => {
+
+  setLoading(true);
+
   try {
-    const response = await API.post("/contacts", newContact);
+
+    const response = await API.get(
+      `/contacts?page=${page}&size=5`
+    );
+
+    setContacts(response.data.content);
+    setTotalPages(response.data.totalPages);
+
+  } catch (error) {
+
+    console.log(error);
+
+  } finally {
+
+    setLoading(false);
+
+  }
+
+};
+  useEffect(() => {
+    fetchContacts();
+  }, [page]);
+
+  const saveContact = async () => {
+
+  console.log("isEditing:", isEditing);
+  console.log("selectedContactId:", selectedContactId);
+  console.log("newContact:", newContact);
+
+  try {
+
+    if (isEditing) {
+
+      console.log("PUT request is being sent");
+
+      await API.put(
+        `/contacts/${selectedContactId}`,
+        newContact
+      );
+
+      setAlert({
+  show: true,
+  message: "Contact updated successfully!",
+  type: "warning",
+});
+
+    } else {
+
+      console.log("POST request is being sent");
+
+      await API.post("/contacts", newContact);
+
+      setAlert({
+  show: true,
+  message: "Contact added successfully!",
+  type: "success",
+});
+    }
 
     fetchContacts();
+
     setNewContact({
       firstName: "",
       lastName: "",
@@ -40,232 +115,206 @@ const addContact = async () => {
       company: "",
       jobTitle: ""
     });
-  
 
-    alert("Contact added successfully!");
+    setIsEditing(false);
+    setSelectedContactId(null);
+
   } catch (error) {
-  console.error(error);
-  console.log(error.response);
+    console.error(error);
+  }
+};
+const editContact = (contact) => {
 
-  alert(
-    error.response?.data?.message ||
-    error.response?.data ||
-    error.message
+  console.log("Edit clicked:", contact);
+
+  setIsEditing(true);
+  setSelectedContactId(contact.id);
+
+  setNewContact({
+    firstName: contact.firstName,
+    lastName: contact.lastName,
+    email: contact.email,
+    phoneNumber: contact.phoneNumber,
+    company: contact.company,
+    jobTitle: contact.jobTitle,
+  });
+
+  const modal = new bootstrap.Modal(
+    document.getElementById("addContactModal")
   );
-}
+
+  modal.show();
+};
+const openDeleteModal = (contact) => {
+
+  setSelectedContact(contact);
+
+  const modal = new bootstrap.Modal(
+    document.getElementById("deleteModal")
+  );
+
+  modal.show();
+
+};
+
+const deleteContact = async () => {
+
+  try {
+
+    await API.delete(`/contacts/${selectedContact.id}`);
+
+    fetchContacts();
+
+    setAlert({
+      show: true,
+      message: "Contact deleted successfully!",
+      type: "danger",
+    });
+
+  } catch (error) {
+
+    console.log(error);
+
+  }
+
+};
+const searchContacts = async () => {
+
+  if (searchText.trim() === "") {
+    fetchContacts();
+    return;
+  }
+
+  try {
+
+    const response = await API.get(
+      `/contacts/search/${searchType}?${searchType}=${searchText}`
+    );
+
+    setContacts(response.data);
+
+  } catch (error) {
+
+    console.log(error);
+
+  }
+
+};
+const applyFilters = async () => {
+
+  try {
+
+    if (companyFilter !== "") {
+
+      const response = await API.get(
+        `/contacts/filter/company?company=${companyFilter}`
+      );
+
+      setContacts(response.data);
+
+      return;
+    }
+
+    if (jobFilter !== "") {
+
+      const response = await API.get(
+        `/contacts/filter/jobtitle?jobTitle=${jobFilter}`
+      );
+
+      setContacts(response.data);
+
+    }
+
+  } catch (error) {
+
+    console.log(error);
+
+  }
+
+};
+
+const clearFilters = () => {
+
+  setCompanyFilter("");
+  setJobFilter("");
+  setSearchText("");
+
+  fetchContacts();
+
 };
   return (
     <div className="container mt-5">
 
       <div className="d-flex justify-content-between align-items-center mb-3">
-    <h2>Contacts</h2>
-
-    <button
-        className="btn btn-primary"
-        data-bs-toggle="modal"
-        data-bs-target="#addContactModal"
-    >
-        + Add Contact
-    </button>
-</div>
-
-      <table className="table table-bordered mt-3">
-
-        <thead>
-          <tr>
-            <th>Name</th>
-            <th>Email</th>
-            <th>Phone</th>
-            <th>Company</th>
-          </tr>
-        </thead>
-
-        <tbody>
-
-          {contacts?.map((contact) => (
-            <tr key={contact.id}>
-              <td>
-                {contact.firstName} {contact.lastName}
-              </td>
-
-              <td>{contact.email}</td>
-
-              <td>{contact.phoneNumber}</td>
-
-              <td>{contact.company}</td>
-
-            </tr>
-          ))}
-
-        </tbody>
-
-      </table>
-      <div className="d-flex justify-content-center align-items-center mt-3 gap-3">
-
-  <button
-    className="btn btn-outline-primary"
-    disabled={page === 0}
-    onClick={() => setPage(page - 1)}
-  >
-    Previous
-  </button>
-
-  <span>
-    Page {page + 1} of {totalPages}
-  </span>
-
-  <button
-    className="btn btn-outline-primary"
-    disabled={page + 1 >= totalPages}
-    onClick={() => setPage(page + 1)}
-  >
-    Next
-  </button>
-
-</div>
-<div
-  className="modal fade"
-  id="addContactModal"
-  tabIndex="-1"
-  aria-labelledby="addContactModalLabel"
-  aria-hidden="true"
->
-  <div className="modal-dialog">
-    <div className="modal-content">
-
-      <div className="modal-header">
-        <h5 className="modal-title" id="addContactModalLabel">
-          Add Contact
-        </h5>
+        {
+  alert.show && (
+    <div className={`alert alert-${alert.type}`}>
+      {alert.message}
+    </div>
+  )
+}
+        <h2>Contacts</h2>
 
         <button
-          type="button"
-          className="btn-close"
-          data-bs-dismiss="modal"
-        ></button>
+          className="btn btn-primary"
+          data-bs-toggle="modal"
+          data-bs-target="#addContactModal"
+        >
+          + Add Contact
+        </button>
       </div>
+<SearchBar
+  searchType={searchType}
+  setSearchType={setSearchType}
+  searchText={searchText}
+  setSearchText={setSearchText}
+  searchContacts={searchContacts}
+/>
+<Filter
+  companyFilter={companyFilter}
+  setCompanyFilter={setCompanyFilter}
+  jobFilter={jobFilter}
+  setJobFilter={setJobFilter}
+  applyFilters={applyFilters}
+  clearFilters={clearFilters}
+/>
+     {
+  loading ? (
 
-      <div className="modal-body">
-       <form>
+    <div className="text-center mt-5">
+      <div className="spinner-border text-primary"></div>
+    </div>
 
-  <div className="mb-3">
-    <label className="form-label">First Name</label>
-    <input
-      type="text"
-      className="form-control"
-      value={newContact.firstName}
-      onChange={(e) =>
-        setNewContact({
-          ...newContact,
-          firstName: e.target.value
-        })
-      }
+  ) : (
+
+    <ContactTable
+      contacts={contacts}
+      onEdit={editContact}
+      onDelete={openDeleteModal}
     />
-  </div>
 
-  <div className="mb-3">
-    <label className="form-label">Last Name</label>
-    <input
-      type="text"
-      className="form-control"
-      value={newContact.lastName}
-      onChange={(e) =>
-        setNewContact({
-          ...newContact,
-          lastName: e.target.value
-        })
-      }
-    />
-  </div>
-
-  <div className="mb-3">
-    <label className="form-label">Email</label>
-    <input
-      type="email"
-      className="form-control"
-      value={newContact.email}
-      onChange={(e) =>
-        setNewContact({
-          ...newContact,
-          email: e.target.value
-        })
-      }
-    />
-  </div>
-
-  <div className="mb-3">
-    <label className="form-label">Phone Number</label>
-    <input
-      type="text"
-      className="form-control"
-      value={newContact.phoneNumber}
-      onChange={(e) =>
-        setNewContact({
-          ...newContact,
-          phoneNumber: e.target.value
-        })
-      }
-    />
-  </div>
-
-  <div className="mb-3">
-    <label className="form-label">Company</label>
-    <input
-      type="text"
-      className="form-control"
-      value={newContact.company}
-      onChange={(e) =>
-        setNewContact({
-          ...newContact,
-          company: e.target.value
-        })
-      }
-    />
-  </div>
-
-  <div className="mb-3">
-    <label className="form-label">Job Title</label>
-    <input
-      type="text"
-      className="form-control"
-      value={newContact.jobTitle}
-      onChange={(e) =>
-        setNewContact({
-          ...newContact,
-          jobTitle: e.target.value
-        })
-      }
-    />
-  </div>
-
-</form>
-      </div>
-
-      <div className="modal-footer">
-
-  <button
-    type="button"
-    className="btn btn-secondary"
-    data-bs-dismiss="modal"
-  >
-    Cancel
-  </button>
-
-  <button
-  type="button"
-  className="btn btn-primary"
-  onClick={addContact}
-  data-bs-dismiss="modal"
->
-  Save Contact
-</button>
-
-</div>
+  )
+}
+<PaginationControls
+    page={page}
+    totalPages={totalPages}
+    setPage={setPage}
+/>
+      
+      <ContactFormModal
+    newContact={newContact}
+    setNewContact={setNewContact}
+    saveContact={saveContact}
+    isEditing={isEditing}
+/>
+     <DeleteModal
+  selectedContact={selectedContact}
+  deleteContact={deleteContact}
+/>
 
     </div>
-  </div>
-    </div>
-    </div>
+    
   );
 }
+
 export default Contacts;
