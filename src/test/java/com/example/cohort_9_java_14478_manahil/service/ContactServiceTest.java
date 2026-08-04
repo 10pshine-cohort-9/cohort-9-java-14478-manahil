@@ -1,5 +1,8 @@
 package com.example.cohort_9_java_14478_manahil.service;
-
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import com.example.cohort_9_java_14478_manahil.dto.ContactDTO;
 import com.example.cohort_9_java_14478_manahil.entity.Contact;
 import com.example.cohort_9_java_14478_manahil.repository.ContactRepository;
@@ -71,15 +74,24 @@ class ContactServiceTest {
     @Test
     void shouldGetAllContacts() {
 
-        when(contactRepository.findAll()).thenReturn(Arrays.asList(contact));
+        Pageable pageable = PageRequest.of(0, 5);
 
-        List<ContactDTO> contacts = contactService.getAllContacts();
+        Page<Contact> contactPage =
+                new PageImpl<>(List.of(contact), pageable, 1);
+
+        when(contactRepository.findAll(pageable))
+                .thenReturn(contactPage);
+
+        Page<ContactDTO> contacts =
+                contactService.getAllContacts(0, 5);
 
         assertNotNull(contacts);
-        assertEquals(1, contacts.size());
-        assertEquals("Manahil", contacts.get(0).getFirstName());
+        assertEquals(1, contacts.getTotalElements());
+        assertEquals("Manahil",
+                contacts.getContent().get(0).getFirstName());
 
-        verify(contactRepository, times(1)).findAll();
+        verify(contactRepository, times(1))
+                .findAll(pageable);
     }
 
     @Test
