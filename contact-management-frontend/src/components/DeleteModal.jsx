@@ -1,16 +1,23 @@
 function DeleteModal({ selectedContact, deleteContact }) {
+  if (!selectedContact) {
+    return null;
+  }
+
   return (
     <div
       className="modal fade"
-      id="deleteModal"
+      id="deleteContactModal"
       tabIndex="-1"
+      aria-labelledby="deleteContactModalLabel"
       aria-hidden="true"
     >
       <div className="modal-dialog">
-        <div className="modal-content">
+        <div className="modal-content shadow">
 
           <div className="modal-header bg-danger text-white">
-            <h5 className="modal-title">Delete Contact</h5>
+            <h5 className="modal-title" id="deleteContactModalLabel">
+              Delete Contact
+            </h5>
 
             <button
               type="button"
@@ -20,17 +27,19 @@ function DeleteModal({ selectedContact, deleteContact }) {
           </div>
 
           <div className="modal-body">
-            Are you sure you want to delete
+            <p className="mb-2">
+              Are you sure you want to delete this contact?
+            </p>
+
             <strong>
-              {" "}
-              {selectedContact?.firstName} {selectedContact?.lastName}
+              {selectedContact.firstName} {selectedContact.lastName}
             </strong>
-            ?
           </div>
 
           <div className="modal-footer">
 
             <button
+              type="button"
               className="btn btn-secondary"
               data-bs-dismiss="modal"
             >
@@ -38,6 +47,7 @@ function DeleteModal({ selectedContact, deleteContact }) {
             </button>
 
             <button
+              type="button"
               className="btn btn-danger"
               onClick={deleteContact}
               data-bs-dismiss="modal"

@@ -1,4 +1,9 @@
-function ContactTable({ contacts, onEdit, onDelete }) {
+function ContactTable({
+  contacts,
+  onEdit,
+  onDelete,
+  onView,
+}) {
   return (
     <table className="table table-hover table-bordered shadow-sm mt-3">
 
@@ -9,7 +14,7 @@ function ContactTable({ contacts, onEdit, onDelete }) {
           <th>Phone</th>
           <th>Company</th>
           <th>Job Title</th>
-          <th width="170">Actions</th>
+          <th width="250">Actions</th>
         </tr>
       </thead>
 
@@ -23,13 +28,28 @@ function ContactTable({ contacts, onEdit, onDelete }) {
         ) : (
           contacts.map((contact) => (
             <tr key={contact.id}>
-              <td>{contact.firstName} {contact.lastName}</td>
+
+              <td>
+                {contact.firstName} {contact.lastName}
+              </td>
+
               <td>{contact.email}</td>
+
               <td>{contact.phoneNumber}</td>
+
               <td>{contact.company}</td>
+
               <td>{contact.jobTitle}</td>
 
               <td>
+
+                <button
+                  className="btn btn-info btn-sm me-2 text-white"
+                  onClick={() => onView(contact)}
+                >
+                  View
+                </button>
+
                 <button
                   className="btn btn-warning btn-sm me-2"
                   onClick={() => onEdit(contact)}
@@ -43,7 +63,9 @@ function ContactTable({ contacts, onEdit, onDelete }) {
                 >
                   Delete
                 </button>
+
               </td>
+
             </tr>
           ))
         )}

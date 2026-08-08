@@ -1,14 +1,16 @@
 import { useEffect, useState } from "react";
 import API from "../api/axiosConfig";
+
 import ContactTable from "../components/ContactTable";
 import ContactFormModal from "../components/ContactFormModal";
-import SearchBar from "../components/SearchBar";
-import Filter from "../components/Filter";
 import DeleteModal from "../components/DeleteModal";
+import ContactDetailsModal from "../components/ContactDetailsModal";
 import PaginationControls from "../components/PaginationControls";
+
 import * as bootstrap from "bootstrap";
 
 function Contacts() {
+
   const [contacts, setContacts] = useState([]);
 
   const [newContact, setNewContact] = useState({
@@ -19,93 +21,141 @@ function Contacts() {
     company: "",
     jobTitle: "",
   });
+
+  const [isEditing, setIsEditing] = useState(false);
+  const [selectedContactId, setSelectedContactId] = useState(null);
+
   const [selectedContact, setSelectedContact] = useState(null);
-
-const [loading, setLoading] = useState(false);
-
-const [alert, setAlert] = useState({
-  show: false,
-  message: "",
-  type: "success",
-});
-
-const [searchType, setSearchType] = useState("firstname");
-const [searchText, setSearchText] = useState("");
-
-const [companyFilter, setCompanyFilter] = useState("");
-const [jobFilter, setJobFilter] = useState("");
-
-const [isEditing, setIsEditing] = useState(false);
-const [selectedContactId, setSelectedContactId] = useState(null);
 
   const [page, setPage] = useState(0);
   const [totalPages, setTotalPages] = useState(0);
 
-const fetchContacts = async () => {
 
-  setLoading(true);
+  // =========================
+  // Fetch Contacts
+  // =========================
 
-  try {
+  const fetchContacts = () => {
 
-    const response = await API.get(
-      `/contacts?page=${page}&size=5`
-    );
+    API.get(`/contacts?page=${page}&size=5`)
+      .then((response) => {
 
-    setContacts(response.data.content);
-    setTotalPages(response.data.totalPages);
+        setContacts(response.data.content);
+        setTotalPages(response.data.totalPages);
 
-  } catch (error) {
+      })
+      .catch((error) => {
+        console.error(error);
+      });
 
-    console.log(error);
+  };
 
-  } finally {
 
-    setLoading(false);
-
-  }
-
-};
   useEffect(() => {
     fetchContacts();
   }, [page]);
 
+
+  // =========================
+  // Add / Update Contact
+  // =========================
+
   const saveContact = async () => {
 
-  console.log("isEditing:", isEditing);
-  console.log("selectedContactId:", selectedContactId);
-  console.log("newContact:", newContact);
+    try {
 
-  try {
+      if (isEditing) {
 
-    if (isEditing) {
+        await API.put(
+          `/contacts/${selectedContactId}`,
+          newContact
+        );
 
-      console.log("PUT request is being sent");
+        alert("Contact updated successfully!");
 
-      await API.put(
-        `/contacts/${selectedContactId}`,
-        newContact
+      } else {
+
+        await API.post(
+          "/contacts",
+          newContact
+        );
+
+        alert("Contact added successfully!");
+      }
+
+
+      fetchContacts();
+
+
+      setNewContact({
+        firstName: "",
+        lastName: "",
+        email: "",
+        phoneNumber: "",
+        company: "",
+        jobTitle: "",
+      });
+
+
+      setIsEditing(false);
+      setSelectedContactId(null);
+
+
+    } catch (error) {
+
+      console.error(error);
+
+      alert(
+        error.response?.data?.message ||
+        error.response?.data ||
+        error.message
       );
 
-      setAlert({
-  show: true,
-  message: "Contact updated successfully!",
-  type: "warning",
-});
-
-    } else {
-
-      console.log("POST request is being sent");
-
-      await API.post("/contacts", newContact);
-
-      setAlert({
-  show: true,
-  message: "Contact added successfully!",
-  type: "success",
-});
     }
 
-    fetchContacts();
+  };
+
+
+  // =========================
+  // Edit Contact
+  // =========================
+
+  const editContact = (contact) => {
+
+    setIsEditing(true);
+
+    setSelectedContactId(contact.id);
+
+    setNewContact({
+      firstName: contact.firstName,
+      lastName: contact.lastName,
+      email: contact.email,
+      phoneNumber: contact.phoneNumber,
+      company: contact.company,
+      jobTitle: contact.jobTitle,
+    });
+
+
+    const modalElement =
+      document.getElementById("addContactModal");
+
+    const modal =
+      bootstrap.Modal.getOrCreateInstance(modalElement);
+
+    modal.show();
+
+  };
+
+
+  // =========================
+  // Add Contact Button
+  // =========================
+
+  const openAddContact = () => {
+
+    setIsEditing(false);
+
+    setSelectedContactId(null);
 
     setNewContact({
       firstName: "",
@@ -113,207 +163,154 @@ const fetchContacts = async () => {
       email: "",
       phoneNumber: "",
       company: "",
-      jobTitle: ""
+      jobTitle: "",
     });
 
-    setIsEditing(false);
-    setSelectedContactId(null);
+  };
 
-  } catch (error) {
-    console.error(error);
-  }
-};
-const editContact = (contact) => {
 
-  console.log("Edit clicked:", contact);
+  // =========================
+  // Delete - Open Modal
+  // =========================
 
-  setIsEditing(true);
-  setSelectedContactId(contact.id);
+  const openDeleteModal = (contact) => {
 
-  setNewContact({
-    firstName: contact.firstName,
-    lastName: contact.lastName,
-    email: contact.email,
-    phoneNumber: contact.phoneNumber,
-    company: contact.company,
-    jobTitle: contact.jobTitle,
-  });
+    setSelectedContact(contact);
 
-  const modal = new bootstrap.Modal(
-    document.getElementById("addContactModal")
-  );
+    const modalElement =
+      document.getElementById("deleteContactModal");
 
-  modal.show();
-};
-const openDeleteModal = (contact) => {
+    const modal =
+      bootstrap.Modal.getOrCreateInstance(modalElement);
 
-  setSelectedContact(contact);
+    modal.show();
 
-  const modal = new bootstrap.Modal(
-    document.getElementById("deleteModal")
-  );
+  };
 
-  modal.show();
 
-};
+  // =========================
+  // Delete Contact
+  // =========================
 
-const deleteContact = async () => {
+  const deleteContact = async () => {
 
-  try {
-
-    await API.delete(`/contacts/${selectedContact.id}`);
-
-    fetchContacts();
-
-    setAlert({
-      show: true,
-      message: "Contact deleted successfully!",
-      type: "danger",
-    });
-
-  } catch (error) {
-
-    console.log(error);
-
-  }
-
-};
-const searchContacts = async () => {
-
-  if (searchText.trim() === "") {
-    fetchContacts();
-    return;
-  }
-
-  try {
-
-    const response = await API.get(
-      `/contacts/search/${searchType}?${searchType}=${searchText}`
-    );
-
-    setContacts(response.data);
-
-  } catch (error) {
-
-    console.log(error);
-
-  }
-
-};
-const applyFilters = async () => {
-
-  try {
-
-    if (companyFilter !== "") {
-
-      const response = await API.get(
-        `/contacts/filter/company?company=${companyFilter}`
-      );
-
-      setContacts(response.data);
-
+    if (!selectedContact) {
       return;
     }
 
-    if (jobFilter !== "") {
+    try {
 
-      const response = await API.get(
-        `/contacts/filter/jobtitle?jobTitle=${jobFilter}`
+      await API.delete(
+        `/contacts/${selectedContact.id}`
       );
 
-      setContacts(response.data);
+      alert("Contact deleted successfully!");
+
+      setSelectedContact(null);
+
+      fetchContacts();
+
+    } catch (error) {
+
+      console.error(error);
+
+      alert(
+        error.response?.data?.message ||
+        error.response?.data ||
+        error.message
+      );
 
     }
 
-  } catch (error) {
+  };
 
-    console.log(error);
 
-  }
+  // =========================
+  // View Contact
+  // =========================
 
-};
+  const viewContact = (contact) => {
 
-const clearFilters = () => {
+    setSelectedContact(contact);
 
-  setCompanyFilter("");
-  setJobFilter("");
-  setSearchText("");
+    const modalElement =
+      document.getElementById("contactDetailsModal");
 
-  fetchContacts();
+    const modal =
+      bootstrap.Modal.getOrCreateInstance(modalElement);
 
-};
+    modal.show();
+
+  };
+
+
   return (
+
     <div className="container mt-5">
 
+      {/* Header */}
+
       <div className="d-flex justify-content-between align-items-center mb-3">
-        {
-  alert.show && (
-    <div className={`alert alert-${alert.type}`}>
-      {alert.message}
-    </div>
-  )
-}
+
         <h2>Contacts</h2>
 
         <button
           className="btn btn-primary"
           data-bs-toggle="modal"
           data-bs-target="#addContactModal"
+          onClick={openAddContact}
         >
           + Add Contact
         </button>
+
       </div>
-<SearchBar
-  searchType={searchType}
-  setSearchType={setSearchType}
-  searchText={searchText}
-  setSearchText={setSearchText}
-  searchContacts={searchContacts}
-/>
-<Filter
-  companyFilter={companyFilter}
-  setCompanyFilter={setCompanyFilter}
-  jobFilter={jobFilter}
-  setJobFilter={setJobFilter}
-  applyFilters={applyFilters}
-  clearFilters={clearFilters}
-/>
-     {
-  loading ? (
 
-    <div className="text-center mt-5">
-      <div className="spinner-border text-primary"></div>
-    </div>
 
-  ) : (
+      {/* Contact Table */}
 
-    <ContactTable
-      contacts={contacts}
-      onEdit={editContact}
-      onDelete={openDeleteModal}
-    />
+      <ContactTable
+        contacts={contacts}
+        onEdit={editContact}
+        onDelete={openDeleteModal}
+        onView={viewContact}
+      />
 
-  )
-}
-<PaginationControls
-    page={page}
-    totalPages={totalPages}
-    setPage={setPage}
-/>
-      
+
+      {/* Pagination */}
+
+      <PaginationControls
+        page={page}
+        totalPages={totalPages}
+        setPage={setPage}
+      />
+
+
+      {/* Add / Edit Modal */}
+
       <ContactFormModal
-    newContact={newContact}
-    setNewContact={setNewContact}
-    saveContact={saveContact}
-    isEditing={isEditing}
-/>
-     <DeleteModal
-  selectedContact={selectedContact}
-  deleteContact={deleteContact}
-/>
+        newContact={newContact}
+        setNewContact={setNewContact}
+        saveContact={saveContact}
+        isEditing={isEditing}
+      />
+
+
+      {/* Delete Confirmation Modal */}
+
+      <DeleteModal
+        selectedContact={selectedContact}
+        deleteContact={deleteContact}
+      />
+
+
+      {/* View Details Modal */}
+
+      <ContactDetailsModal
+        contact={selectedContact}
+      />
 
     </div>
-    
+
   );
 }
 
