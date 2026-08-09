@@ -243,41 +243,75 @@ function Contacts() {
 
   };
 
+return (
+  <div className="contacts-page">
 
-  return (
+    <div className="container page-container">
 
-    <div className="container mt-5">
+      {/* Page Header */}
+      <div className="contacts-header">
 
-      {/* Header */}
+        <div>
+          <p className="contacts-eyebrow">
+            CONTACT MANAGEMENT
+          </p>
 
-      <div className="d-flex justify-content-between align-items-center mb-3">
+          <h1 className="contacts-title">
+            Your Contacts
+          </h1>
 
-        <h2>Contacts</h2>
+          <p className="contacts-subtitle">
+            Manage, organize and keep track of your contacts.
+          </p>
+        </div>
 
         <button
-          className="btn btn-primary"
+          className="btn btn-contact-primary"
           data-bs-toggle="modal"
           data-bs-target="#addContactModal"
           onClick={openAddContact}
         >
-          + Add Contact
+          <span className="add-icon">+</span>
+          Add Contact
         </button>
 
       </div>
 
 
-      {/* Contact Table */}
+      {/* Contacts Table */}
+      <div className="contacts-table-card">
 
-      <ContactTable
-        contacts={contacts}
-        onEdit={editContact}
-        onDelete={openDeleteModal}
-        onView={viewContact}
-      />
+        <div className="contacts-table-header">
+
+          <div>
+            <h5>All Contacts</h5>
+
+            <p>
+              View and manage your saved contacts
+            </p>
+          </div>
+
+        </div>
+
+        <div className="table-responsive">
+
+          <table className="table contacts-table">
+
+            <ContactTable
+              contacts={contacts}
+              onEdit={editContact}
+              onDelete={openDeleteModal}
+              onView={viewContact}
+            />
+
+          </table>
+
+        </div>
+
+      </div>
 
 
       {/* Pagination */}
-
       <PaginationControls
         page={page}
         totalPages={totalPages}
@@ -285,7 +319,7 @@ function Contacts() {
       />
 
 
-      {/* Add / Edit Modal */}
+      {/* Modals */}
 
       <ContactFormModal
         newContact={newContact}
@@ -294,16 +328,10 @@ function Contacts() {
         isEditing={isEditing}
       />
 
-
-      {/* Delete Confirmation Modal */}
-
       <DeleteModal
         selectedContact={selectedContact}
         deleteContact={deleteContact}
       />
-
-
-      {/* View Details Modal */}
 
       <ContactDetailsModal
         contact={selectedContact}
@@ -311,7 +339,9 @@ function Contacts() {
 
     </div>
 
-  );
+  </div>
+);
+  
 }
 
 export default Contacts;

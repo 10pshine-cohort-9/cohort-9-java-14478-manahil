@@ -4,74 +4,136 @@ function ContactTable({
   onDelete,
   onView,
 }) {
-  return (
-    <table className="table table-hover table-bordered shadow-sm mt-3">
 
-      <thead className="table-dark">
+  return (
+    <>
+
+      <thead>
         <tr>
-          <th>Name</th>
+          <th>Contact</th>
           <th>Email</th>
           <th>Phone</th>
           <th>Company</th>
           <th>Job Title</th>
-          <th width="250">Actions</th>
+          <th className="text-end">Actions</th>
         </tr>
       </thead>
 
       <tbody>
+
         {contacts.length === 0 ? (
+
           <tr>
-            <td colSpan="6" className="text-center">
-              No contacts found.
+            <td
+              colSpan="6"
+              className="empty-contacts"
+            >
+
+              <div className="empty-icon">
+                👤
+              </div>
+
+              <strong>
+                No contacts found
+              </strong>
+
+              <span>
+                Add a contact to get started.
+              </span>
+
             </td>
           </tr>
+
         ) : (
+
           contacts.map((contact) => (
+
             <tr key={contact.id}>
 
+              {/* Contact */}
               <td>
-                {contact.firstName} {contact.lastName}
+
+                <div className="contact-name">
+
+                  <div className="contact-avatar">
+                    {contact.firstName?.charAt(0)}
+                    {contact.lastName?.charAt(0)}
+                  </div>
+
+                  <div className="contact-name-details">
+
+                    <strong>
+                      {contact.firstName} {contact.lastName}
+                    </strong>
+
+                  </div>
+
+                </div>
+
               </td>
 
-              <td>{contact.email}</td>
+              {/* Email */}
+              <td>
+                {contact.email}
+              </td>
 
-              <td>{contact.phoneNumber}</td>
+              {/* Phone */}
+              <td>
+                {contact.phoneNumber}
+              </td>
 
-              <td>{contact.company}</td>
+              {/* Company */}
+              <td>
+                {contact.company || "—"}
+              </td>
 
-              <td>{contact.jobTitle}</td>
+              {/* Job Title */}
+              <td>
+                {contact.jobTitle || "—"}
+              </td>
 
+              {/* Actions */}
               <td>
 
-                <button
-                  className="btn btn-info btn-sm me-2 text-white"
-                  onClick={() => onView(contact)}
-                >
-                  View
-                </button>
+                <div className="contact-actions">
 
-                <button
-                  className="btn btn-warning btn-sm me-2"
-                  onClick={() => onEdit(contact)}
-                >
-                  Edit
-                </button>
+                  <button
+                    type="button"
+                    className="action-btn btn-view"
+                    onClick={() => onView(contact)}
+                  >
+                    View
+                  </button>
 
-                <button
-                  className="btn btn-danger btn-sm"
-                  onClick={() => onDelete(contact)}
-                >
-                  Delete
-                </button>
+                  <button
+                    type="button"
+                    className="action-btn btn-edit"
+                    onClick={() => onEdit(contact)}
+                  >
+                    Edit
+                  </button>
+
+                  <button
+                    type="button"
+                    className="action-btn btn-delete"
+                    onClick={() => onDelete(contact)}
+                  >
+                    Delete
+                  </button>
+
+                </div>
 
               </td>
 
             </tr>
+
           ))
+
         )}
+
       </tbody>
 
-    </table>
+    </>
   );
 }
 
