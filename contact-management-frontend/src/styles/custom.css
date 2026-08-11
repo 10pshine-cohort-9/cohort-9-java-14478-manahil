@@ -1498,3 +1498,130 @@ body {
     font-size: 18px;
   }
 }
+/* =================================
+   SEARCH & FILTER
+================================= */
+
+.contacts-tools {
+  display: flex;
+  align-items: flex-end;
+  gap: 24px;
+  padding: 22px 24px;
+  margin: 0;
+  background: #faf9ff;
+  border-top: 1px solid #eeeaf7;
+  border-bottom: 1px solid #eeeaf7;
+}
+
+/* Search */
+
+.contact-search-box {
+  flex: 1;
+  max-width: 650px;
+}
+
+.contact-filter-box {
+  width: 220px;
+}
+
+.contact-search-box label,
+.contact-filter-box label {
+  display: block;
+  margin-bottom: 8px;
+  font-size: 13px;
+  font-weight: 600;
+  color: #555064;
+}
+
+/* Search input */
+
+.search-input-wrapper {
+  position: relative;
+}
+
+.search-input-wrapper .form-control {
+  height: 44px;
+  padding-left: 42px;
+  padding-right: 40px;
+  border: 1px solid #ddd8e8;
+  border-radius: 10px;
+  background: white;
+  font-size: 14px;
+  box-shadow: none;
+  transition: 0.2s ease;
+}
+
+.search-input-wrapper .form-control:focus {
+  border-color: #9b7dcc;
+  box-shadow: 0 0 0 3px rgba(155, 125, 204, 0.12);
+}
+
+/* Search icon */
+
+.search-icon {
+  position: absolute;
+  left: 15px;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 21px;
+  color: #8b8498;
+  z-index: 2;
+}
+
+/* Clear button */
+
+.clear-search {
+  position: absolute;
+  right: 10px;
+  top: 50%;
+  transform: translateY(-50%);
+  border: none;
+  background: transparent;
+  color: #8b8498;
+  font-size: 20px;
+  cursor: pointer;
+  padding: 2px 6px;
+}
+
+.clear-search:hover {
+  color: #5f566d;
+}
+
+/* Filter */
+
+.contact-filter-box .form-select {
+  height: 44px;
+  border: 1px solid #ddd8e8;
+  border-radius: 10px;
+  background-color: white;
+  font-size: 14px;
+  color: #413a4c;
+  cursor: pointer;
+  box-shadow: none;
+}
+
+.contact-filter-box .form-select:focus {
+  border-color: #9b7dcc;
+  box-shadow: 0 0 0 3px rgba(155, 125, 204, 0.12);
+}
+
+
+/* =================================
+   MOBILE
+================================= */
+
+@media (max-width: 768px) {
+
+  .contacts-tools {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 16px;
+  }
+
+  .contact-search-box,
+  .contact-filter-box {
+    width: 100%;
+    max-width: none;
+  }
+
+}
