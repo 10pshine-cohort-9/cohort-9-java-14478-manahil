@@ -58,7 +58,14 @@ public class UserController {
         );
     }
 
+    @GetMapping("/me")
+    public ResponseEntity<UserResponseDTO> getCurrentUser(
+            Authentication authentication) {
 
+        return ResponseEntity.ok(
+                userService.getUserByEmail(authentication.getName())
+        );
+    }
     @DeleteMapping("/{id}")
     public ResponseEntity<String> deleteUser(
             @PathVariable Long id) {
