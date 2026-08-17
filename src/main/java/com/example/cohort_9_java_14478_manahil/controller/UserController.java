@@ -58,14 +58,7 @@ public class UserController {
         );
     }
 
-    @GetMapping("/me")
-    public ResponseEntity<UserResponseDTO> getCurrentUser(
-            Authentication authentication) {
 
-        return ResponseEntity.ok(
-                userService.getUserByEmail(authentication.getName())
-        );
-    }
     @DeleteMapping("/{id}")
     public ResponseEntity<String> deleteUser(
             @PathVariable Long id) {
@@ -73,6 +66,14 @@ public class UserController {
         userService.deleteUser(id);
 
         return ResponseEntity.ok("User deleted successfully");
+    }
+    @GetMapping("/me")
+    public ResponseEntity<UserResponseDTO> getCurrentUser(
+            Authentication authentication) {
+
+        return ResponseEntity.ok(
+                userService.getUserByEmail(authentication.getName())
+        );
     }
     @PutMapping("/change-password")
     public ResponseEntity<String> changePassword(
