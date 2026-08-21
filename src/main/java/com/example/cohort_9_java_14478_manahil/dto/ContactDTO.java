@@ -37,7 +37,7 @@ public class ContactDTO {
     private String email;
 
     @NotBlank(message = "Phone number is required")
-    @Pattern(regexp = "^[0-9]{11}$", message = "Phone number must contain exactly 11 digits")
+    @Pattern(regexp = "^\\d{11}$", message = "Phone number must contain exactly 11 digits")
     private String phoneNumber;
 
     @Size(max = 100, message = "Company name cannot exceed 100 characters")
