@@ -1,5 +1,5 @@
 package com.example.cohort_9_java_14478_manahil.service;
-
+import org.mockito.ArgumentCaptor;
 import com.example.cohort_9_java_14478_manahil.dto.ChangePasswordRequest;
 import com.example.cohort_9_java_14478_manahil.dto.UserDTO;
 import com.example.cohort_9_java_14478_manahil.dto.UserResponseDTO;
@@ -55,7 +55,6 @@ class UserServiceTest {
         userDTO.setPassword("password123");
         userDTO.setRole("USER");
     }
-
     @Test
     void createUser_shouldCreateAndReturnUser() {
 
@@ -63,7 +62,11 @@ class UserServiceTest {
                 .thenReturn("encodedPassword");
 
         when(userRepository.save(any(User.class)))
-                .thenReturn(user);
+                .thenAnswer(invocation -> {
+                    User savedUser = invocation.getArgument(0);
+                    savedUser.setId(1L);
+                    return savedUser;
+                });
 
         UserResponseDTO result = userService.createUser(userDTO);
 
@@ -74,7 +77,10 @@ class UserServiceTest {
         assertEquals("manahil@example.com", result.getEmail());
 
         verify(passwordEncoder).encode("password123");
-        verify(userRepository).save(any(User.class));
+
+        verify(userRepository).save(argThat(savedUser ->
+                "encodedPassword".equals(savedUser.getPassword())
+        ));
     }
 
     @Test
@@ -152,9 +158,18 @@ class UserServiceTest {
         assertEquals("Waheed", result.getLastName());
         assertEquals("manahil@example.com", result.getEmail());
 
+        ArgumentCaptor<User> userCaptor =
+                ArgumentCaptor.forClass(User.class);
+
         verify(userRepository).findById(1L);
-        verify(userRepository).save(user);
         verify(passwordEncoder).encode("password123");
+        verify(userRepository).save(userCaptor.capture());
+
+        assertEquals(
+                "encodedPassword",
+                userCaptor.getValue().getPassword()
+        );
+
     }
 
     @Test
