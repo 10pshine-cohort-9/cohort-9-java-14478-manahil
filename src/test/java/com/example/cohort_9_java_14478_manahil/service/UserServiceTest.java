@@ -221,7 +221,7 @@ class UserServiceTest {
                 .thenReturn(Optional.empty());
 
         assertThrows(
-                RuntimeException.class,
+                UserNotFoundException.class,
                 () -> userService.getUserByEmail("unknown@example.com")
         );
 
